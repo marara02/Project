@@ -1,0 +1,152 @@
+//Article.java
+package com.company;
+
+public interface Article {
+    void readen();
+    void morePictures();
+    void action();
+}
+//Book
+package com.company;
+
+public interface Book {
+    void read();
+    boolean hasAudioBook();
+    void action();
+}
+//Database.php
+package com.company;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+public class DatabaseBook {
+    private static DatabaseBook instance;
+    private Connection connection;
+    private DatabaseBook() {
+        System.out.println("--------------------------Book catalog----------------------------");
+
+        try {
+
+            Class.forName("com.mysql.jdbc.Driver");
+
+        } catch (ClassNotFoundException e) {
+
+            System.out.println("Where is MySQL JDBC Driver? "
+                    + "Include in your library path!");
+            e.printStackTrace();
+            return;
+
+        }
+
+        System.out.println("MySQL JDBC Driver Registered!");
+
+        try {
+
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/Bookshopping"
+                    ,"root","123456");
+
+        } catch (SQLException e) {
+            System.out.println("Connection Failed! Check output console");
+            e.printStackTrace();
+
+        }
+    }
+    public static DatabaseBook getInstance() {
+        if (DatabaseBook.instance == null)
+            DatabaseBook.instance = new DatabaseBook();
+        return DatabaseBook.instance;
+    }
+    public void query(String sql) {
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet resultSet = stmt.executeQuery(sql);
+            while(resultSet.next())
+                System.out.printf("%-30.30s  %-30.30s%n", resultSet.getString("Book_name"),
+                        resultSet.getString("Category"));
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+//EducationalBooks.java
+package com.company;
+
+import java.util.Scanner;
+
+public class EducationalBooks implements Book,HighSchoolProgramBooks,SecondarySchoolBooks {
+    Scanner scanner = new Scanner(System.in);
+    private int grade = scanner.nextInt();
+    private String bookType = scanner.nextLine();
+    @Override
+    public void read() {
+        System.out.println("For school auditory");
+    }
+
+    @Override
+    public boolean hasAudioBook() {
+        System.out.println("Enter your grade:");
+        if(grade == 1 || grade == 2){
+            System.out.println("Audio book required");
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void OnlineBooks() {
+       if(grade == 10 || grade ==11) {
+           if (bookType == "History") {
+               System.out.println("Online books");
+           }
+       }
+    }
+
+    @Override
+    public boolean isFree() {
+        if(grade == 1){
+            if(bookType == "math copybook" || bookType == "english copybook"){
+                return true;
+            }
+        }
+        return false;
+    }
+    @Override
+    public void action() {
+        read();
+        hasAudioBook();
+        OnlineBooks();
+        isFree();
+    }
+}
+//FashionArticles.java
+package com.company;
+
+import java.util.Scanner;
+
+public class FashionArticles implements Article {
+    Scanner scanner = new Scanner(System.in);
+    private String name = scanner.nextLine();
+    private String publishedAt;
+    public FashionArticles(String publishedAt){
+        this.publishedAt = publishedAt;
+    }
+    @Override
+    public void readen() {
+        System.out.println(name + ' '+"was read by 1000 people per year");
+    }
+
+    @Override
+    public void morePictures() {
+        System.out.println("All pictures was picked from ELLE and Forbes");
+    }
+
+    @Override
+    public void action() {
+        readen();
+        morePictures();
+    }
+}
+
